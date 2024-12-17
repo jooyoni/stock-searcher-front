@@ -1,0 +1,16 @@
+.table {
+  width: 100%;
+  tr > * {
+    padding: 10px 5px;
+  }
+  td:not(:first-child) {
+    text-align: right;
+    font-size: 12px;
+  }
+  .stockInfo {
+    span {
+      font-size: 14px;
+      font-weight: bold;
+    }
+  }
+}
