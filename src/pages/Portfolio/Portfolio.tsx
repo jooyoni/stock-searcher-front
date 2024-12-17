@@ -5,6 +5,7 @@ import { IPortfolio } from '../../types/stock';
 import ModalPortal from '../../components/ModalPortal/ModalPortal';
 import ModalContainer from '../../components/ModalContainer/ModalContainer';
 import { useState } from 'react';
+import Header from '../../components/Header/Header';
 
 function Portfolio() {
   const { data, refetch } = useQuery<IPortfolio[]>({
@@ -22,6 +23,7 @@ function Portfolio() {
   const [addModalOpen, setAddModalOpen] = useState(false);
   return (
     <>
+      <Header />
       <div className={styles.portfolioPage}>
         <div className={styles.currencySetting}>
           <button className={currency === 'krw' ? styles.active : ''} onClick={() => setCurrency('krw')}>
@@ -185,6 +187,7 @@ function PortfolioStock({
     axiosInstance.delete(`/api/stock/portfolio?ticker=${stock.ticker}`).then((res) => res.data)
   );
   async function handleDelete() {
+    if (!window.confirm('삭제하시겠습니까?')) return;
     try {
       await deleteMutateAsync();
       onUpdate();
