@@ -4,7 +4,7 @@ import Portfolio from './pages/Portfolio/Portfolio';
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename='/stock-searcher-front'>
       <Routes>
         <Route path='/' element={<Main />} />
       </Routes>
