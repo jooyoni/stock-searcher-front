@@ -1,5 +1,5 @@
 import axios from 'axios';
 
 export const axiosInstance = axios.create({
-  baseURL: `http://192.168.0.63:3001`,
+  baseURL: `https://neat-salmon-jooyeon-c3c36dcb.koyeb.app/`,
 });
