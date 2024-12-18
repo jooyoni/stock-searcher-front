@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/stock-searcher-front/static/css/main.55299274.css",
-    "main.js": "/stock-searcher-front/static/js/main.d5ff5b52.js",
+    "main.js": "/stock-searcher-front/static/js/main.a126fc2b.js",
     "static/js/453.adb58d9e.chunk.js": "/stock-searcher-front/static/js/453.adb58d9e.chunk.js",
     "static/media/PretendardVariable.woff2": "/stock-searcher-front/static/media/PretendardVariable.2bc582461caf4e05b51d.woff2",
     "static/media/Pretendard-Bold.subset.woff": "/stock-searcher-front/static/media/Pretendard-Bold.subset.1c1244339e3f1de8db68.woff",
@@ -10,11 +10,11 @@
     "static/media/Pretendard-Regular.subset.woff": "/stock-searcher-front/static/media/Pretendard-Regular.subset.955bceee0409b8095d96.woff",
     "index.html": "/stock-searcher-front/index.html",
     "main.55299274.css.map": "/stock-searcher-front/static/css/main.55299274.css.map",
-    "main.d5ff5b52.js.map": "/stock-searcher-front/static/js/main.d5ff5b52.js.map",
+    "main.a126fc2b.js.map": "/stock-searcher-front/static/js/main.a126fc2b.js.map",
     "453.adb58d9e.chunk.js.map": "/stock-searcher-front/static/js/453.adb58d9e.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.55299274.css",
-    "static/js/main.d5ff5b52.js"
+    "static/js/main.a126fc2b.js"
   ]
 }
