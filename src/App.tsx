@@ -4,7 +4,7 @@ import Portfolio from './pages/Portfolio/Portfolio';
 
 function App() {
   return (
-    <BrowserRouter basename={process.env.PUBLIC_URL}>
+    <BrowserRouter>
       <Routes>
         <Route path='/' element={<Main />} />
       </Routes>
