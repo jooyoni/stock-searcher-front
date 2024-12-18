@@ -55,5 +55,5 @@
     "eslint-plugin-react-hooks": "^5.1.0",
     "prettier": "^3.4.2"
   },
-  "homepage": "./stock-searcher-front/"
+  "homepage": "https://jooyoni.github.io/stock-searcher-front/"
 }
