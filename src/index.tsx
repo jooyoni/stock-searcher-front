@@ -10,8 +10,8 @@ const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: 0,
-      refetchOnWindowFocus: false,
+      retry: 1,
+      // refetchOnWindowFocus: false,
     },
   },
 });
