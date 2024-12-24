@@ -14,21 +14,21 @@ function Main() {
   function handleStockClick(ticker: string) {
     const storage = [...checkedList];
     if (!storage.includes(ticker)) storage.push(ticker);
-    sessionStorage.setItem('stockList', JSON.stringify(storage));
+    localStorage.setItem('stockList', JSON.stringify(storage));
     window.location.href = `https://invest.deepsearch.com/stock/${ticker}`;
   }
 
   function handleCancelAll() {
     if (!window.confirm('전체취소 하시겠습니까?')) return;
     setCheckedList([]);
-    sessionStorage.removeItem('stockList');
+    localStorage.removeItem('stockList');
   }
 
-  const [checkedList, setCheckedList] = useState<string[]>(JSON.parse(sessionStorage.getItem('stockList') || '[]'));
+  const [checkedList, setCheckedList] = useState<string[]>(JSON.parse(localStorage.getItem('stockList') || '[]'));
 
   useEffect(() => {
     const handlePageShow = () => {
-      setCheckedList(JSON.parse(sessionStorage.getItem('stockList') || '[]'));
+      setCheckedList(JSON.parse(localStorage.getItem('stockList') || '[]'));
     };
     window.addEventListener('pageshow', handlePageShow);
     return () => {
@@ -77,7 +77,7 @@ function Main() {
                               newList.push(stock.ticker);
                             }
                             setCheckedList(newList);
-                            sessionStorage.setItem('stockList', JSON.stringify(newList));
+                            localStorage.setItem('stockList', JSON.stringify(newList));
                           }}
                         >
                           {stock.ticker}
