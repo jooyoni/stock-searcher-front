@@ -29,3 +29,10 @@ export interface IPick {
   price: number;
   ticker: string;
 }
+
+export interface IRealizedProfit {
+  created_at: string;
+  id: number;
+  sell_price: number;
+  ticker: string;
+}

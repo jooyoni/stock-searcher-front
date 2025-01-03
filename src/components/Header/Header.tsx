@@ -42,7 +42,10 @@ function Header() {
           <Link to='/pick'>찜</Link>
         </li>
         <li>
-          <Link to='/portfolio'>포트폴리오</Link>
+          <Link to='/realized-profit'>실현손익</Link>
+        </li>
+        <li>
+          <Link to='/portfolio'>포폴</Link>
         </li>
       </ul>
     </header>
