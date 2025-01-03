@@ -22,3 +22,10 @@ export interface IPortfolio {
   ticker: string;
   update_date: string;
 }
+
+export interface IPick {
+  created_at: string;
+  pick_price: number;
+  price: number;
+  ticker: string;
+}

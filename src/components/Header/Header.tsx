@@ -27,13 +27,19 @@ function Header() {
           }
           const totalProfit = totalMarketValue - totalInvestment;
           return (
-            <span>{Number((totalProfit * (exchangeRate?.exchange_rate || 0)).toFixed(0)).toLocaleString()}원</span>
+            <span>
+              {totalProfit >= 0 ? '+' : null}
+              {Number((totalProfit * (exchangeRate?.exchange_rate || 0)).toFixed(0)).toLocaleString()}원
+            </span>
           );
         })()}
       </span>
       <ul>
         <li>
           <Link to='/'>홈</Link>
+        </li>
+        <li>
+          <Link to='/pick'>찜</Link>
         </li>
         <li>
           <Link to='/portfolio'>포트폴리오</Link>

@@ -1,0 +1,24 @@
+.container {
+  padding: 0 16px;
+}
+.pickTable {
+  width: 100%;
+  border-spacing: 0;
+  position: relative;
+  thead {
+    position: sticky;
+    top: 50px;
+    z-index: 1;
+  }
+  td:not(:first-child) {
+    text-align: right;
+    font-size: 12px;
+  }
+  tr {
+    height: 40px;
+  }
+  tbody tr td:first-child {
+    font-size: 14px;
+    font-weight: bold;
+  }
+}

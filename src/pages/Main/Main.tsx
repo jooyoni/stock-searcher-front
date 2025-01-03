@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 import { axiosInstance } from '../../axios/axios';
 import { IStock } from '../../types/stock';
 import styles from './Main.module.scss';
@@ -35,6 +35,26 @@ function Main() {
       window.removeEventListener('pageshow', handlePageShow);
     };
   }, []);
+
+  const { mutateAsync: postPick } = useMutation<null, null, { ticker: string; pick_price: number }>({
+    mutationFn: (props) =>
+      axiosInstance
+        .post('/api/stock/pick', {
+          ticker: props.ticker,
+          pick_price: props.pick_price,
+        })
+        .then((res) => res.data),
+  });
+
+  async function handlePick(ticker: string, pick_price: number) {
+    try {
+      await postPick({ ticker, pick_price });
+      alert('관심종목 등록 완료');
+    } catch {
+      alert('에러가 발생했습니다.');
+    }
+  }
+
   return (
     <>
       <Header />
@@ -88,7 +108,14 @@ function Main() {
                     <td>{stock.low_price_year}$</td>
                     <td>{stock.high_price_year}$</td>
                     <td>{stock.per}</td>
-                    <td>{stock.pbr}</td>
+                    <td
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handlePick(stock.ticker, stock.price);
+                      }}
+                    >
+                      {stock.pbr}
+                    </td>
                   </tr>
                 );
               })}
