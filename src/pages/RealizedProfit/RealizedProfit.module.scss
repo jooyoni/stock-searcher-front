@@ -23,6 +23,23 @@
   }
 }
 
+.viewMode {
+  display: flex;
+  gap: 4px;
+  button {
+    padding: 6px 12px;
+    border-radius: 4px;
+    border: none;
+    background-color: #dadadb;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+    &.active {
+      background-color: #396aff;
+    }
+  }
+}
+
 .profitTable {
   width: 100%;
   border-spacing: 0;

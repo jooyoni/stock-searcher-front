@@ -66,6 +66,10 @@ body {
   &::-webkit-scrollbar {
     display: none;
   }
-  background-color: #200606;
+  background-color: black;
   color: white;
+}
+
+body {
+  min-height: 100vh;
 }

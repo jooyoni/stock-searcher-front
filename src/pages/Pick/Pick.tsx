@@ -38,9 +38,15 @@ function Pick() {
           </thead>
           <tbody>
             {data?.map((stock) => (
-              <tr key={stock.ticker}>
+              <tr
+                key={stock.ticker}
+                onClick={() => {
+                  window.location.href = `https://invest.deepsearch.com/stock/${stock.ticker}`;
+                }}
+              >
                 <td
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
                     if (window.confirm(`${stock.ticker}를 삭제하시겠습니까?`)) {
                       handleDeletePick(stock.ticker);
                     }

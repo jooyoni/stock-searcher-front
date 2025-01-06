@@ -31,6 +31,8 @@ function RealizedProfit() {
     }
   }
 
+  const [viewMode, setViewMode] = useState<'day' | 'month'>('day');
+
   return (
     <>
       <Header />
@@ -45,46 +47,103 @@ function RealizedProfit() {
             원
           </span>
         </div>
+        <div className={styles.viewMode}>
+          <button className={viewMode === 'day' ? styles.active : ''} onClick={() => setViewMode('day')}>
+            일별
+          </button>
+          <button className={viewMode === 'month' ? styles.active : ''} onClick={() => setViewMode('month')}>
+            월별
+          </button>
+        </div>
         <table className={styles.profitTable}>
           <thead>
             <tr>
-              <th></th>
-              <th>실현손익</th>
-              <th>날짜</th>
-              <th>변경</th>
+              {viewMode === 'day' ? (
+                <>
+                  <th></th>
+                  <th>티커</th>
+                  <th>실현손익</th>
+                  <th>변경</th>
+                </>
+              ) : (
+                <>
+                  <th>월</th>
+                  <th>실현손익</th>
+                </>
+              )}
             </tr>
           </thead>
           <tbody>
-            {data?.map((item) => (
-              <tr key={item.created_at}>
-                <td>{item.ticker}</td>
-                <td>{item.sell_price.toLocaleString()}</td>
-                <td>
-                  {(() => {
+            {viewMode === 'day'
+              ? data?.map((item) => {
+                  return (
+                    <tr key={item.created_at}>
+                      <td>
+                        {(() => {
+                          const date = new Date(item.created_at);
+                          return `${date.getFullYear()}-${
+                            date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1
+                          }-${date.getDate() < 10 ? '0' + date.getDate() : date.getDate()}`;
+                        })()}
+                      </td>
+                      <td>{item.ticker}</td>
+                      <td>{item.sell_price.toLocaleString()}</td>
+                      <td>
+                        <div className={styles.btns}>
+                          <button onClick={() => setUpdateProfit(item)}>수정</button>
+                          <button
+                            onClick={() => {
+                              if (window.confirm('삭제하시겠습니까?')) {
+                                handleDelete(item.id);
+                              }
+                            }}
+                          >
+                            삭제
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              : (() => {
+                  const monthData: {
+                    year: number;
+                    month: number;
+                    price: number;
+                  }[] = [];
+                  data?.forEach((item) => {
                     const date = new Date(item.created_at);
-                    return `${date.getFullYear()}-${
-                      date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1
-                    }-${date.getDate() < 10 ? '0' + date.getDate() : date.getDate()}`;
-                  })()}
-                </td>
-                <td>
-                  <div className={styles.btns}>
-                    <button onClick={() => setUpdateProfit(item)}>수정</button>
-                    <button
-                      onClick={() => {
-                        if (window.confirm('삭제하시겠습니까?')) {
-                          handleDelete(item.id);
-                        }
-                      }}
-                    >
-                      삭제
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
+                    const year = date.getFullYear();
+                    const month = date.getMonth() + 1;
+                    const lastData = monthData[monthData.length - 1];
+                    if (lastData && lastData.year === year && lastData.month === month) {
+                      lastData.price += item.sell_price;
+                    } else {
+                      monthData.push({ year, month, price: item.sell_price });
+                    }
+                  });
+
+                  return monthData.map((item) => {
+                    return (
+                      <tr key={`${item.year}-${item.month}`}>
+                        <td>{`${item.year}-${('0' + item.month).slice(-2)}`}</td>
+                        <td>{item.price.toLocaleString()}</td>
+                      </tr>
+                    );
+                  });
+                })()}
           </tbody>
         </table>
+        {/* <div className={styles.monthProfit}>
+          <span>월별 실현손익</span>
+          <span>
+            {(() => {
+              const totalPrice = data ? data.reduce((acc, item) => acc + item.sell_price, 0) : 0;
+              return (totalPrice >= 0 ? '+' : '') + totalPrice?.toLocaleString();
+            })()}
+            원
+          </span>
+        </div> */}
       </div>
       <button className={styles.addButton} onClick={() => setAddModalOpen(true)}>
         +
