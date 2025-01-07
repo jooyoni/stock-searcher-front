@@ -32,8 +32,8 @@ function Pick() {
               <th></th>
               <th>등록가</th>
               <th>현재가</th>
+              <th>PBR</th>
               <th>등락율</th>
-              <th>등록일</th>
             </tr>
           </thead>
           <tbody>
@@ -56,15 +56,8 @@ function Pick() {
                 </td>
                 <td>{stock.pick_price}$</td>
                 <td>{stock.price}$</td>
+                <td>{stock.pbr}</td>
                 <td>{(((stock.price - stock.pick_price) / stock.pick_price) * 100).toFixed(2)}%</td>
-                <td>
-                  {(() => {
-                    const date = new Date(stock.created_at);
-                    return `${date.getFullYear()}.${('0' + (date.getMonth() + 1)).slice(-2)}.${(
-                      '0' + date.getDate()
-                    ).slice(-2)}`;
-                  })()}
-                </td>
               </tr>
             ))}
           </tbody>

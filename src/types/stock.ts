@@ -27,6 +27,7 @@ export interface IPick {
   created_at: string;
   pick_price: number;
   price: number;
+  pbr: number;
   ticker: string;
 }
 
