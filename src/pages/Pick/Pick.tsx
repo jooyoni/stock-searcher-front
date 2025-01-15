@@ -24,7 +24,7 @@ function Pick() {
     }
   }
 
-  const [lastViewStock] = useState(sessionStorage.getItem('lastViewStock') || '');
+  const [lastViewStock, setLastViewStock] = useState(localStorage.getItem('lastViewStock') || '');
 
   const [selectedPick, setSelectedPick] = useState<string[]>(JSON.parse(localStorage.getItem('selectedPick') || '[]'));
 
@@ -36,6 +36,16 @@ function Pick() {
   function handleCancelAll() {
     setSelectedPick([]);
     localStorage.removeItem('selectedPick');
+  }
+
+  function handleStockClick(ticker: string) {
+    if (lastViewStock === ticker) {
+      setLastViewStock('');
+      localStorage.removeItem('lastViewStock');
+    } else {
+      localStorage.setItem('lastViewStock', ticker);
+      window.location.href = `https://invest.deepsearch.com/stock/${ticker}`;
+    }
   }
   return (
     <>
@@ -58,10 +68,7 @@ function Pick() {
             {data?.map((stock) => (
               <tr
                 key={stock.ticker}
-                onClick={() => {
-                  sessionStorage.setItem('lastViewStock', stock.ticker);
-                  window.location.href = `https://invest.deepsearch.com/stock/${stock.ticker}`;
-                }}
+                onClick={() => handleStockClick(stock.ticker)}
                 className={`${selectedPick.includes(stock.ticker) ? styles.active : ''} ${
                   lastViewStock === stock.ticker ? styles.viewed : ''
                 }`}

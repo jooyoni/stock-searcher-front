@@ -11,7 +11,7 @@ function Main() {
     queryFn: () => axiosInstance.get('/api/stock/list').then((res) => res.data),
     initialData: JSON.parse(localStorage.getItem('cachedStockList') || '[]'),
   });
-  console.log(data);
+
   function handleStockClick(ticker: string) {
     const storage = [...checkedList];
     if (!storage.includes(ticker)) storage.push(ticker);
