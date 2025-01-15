@@ -16,6 +16,33 @@
   }
   tr {
     height: 40px;
+    &.active td {
+      border: none;
+      background-color: rgb(109, 23, 23);
+    }
+    &.viewed td {
+      position: relative;
+      &::after {
+        content: '';
+        display: block;
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+        transform: translateY(-50%);
+        background-color: red;
+      }
+    }
+    button {
+      padding: 4px 8px;
+      border-radius: 4px;
+      border: none;
+      background-color: #396aff;
+      color: white;
+      cursor: pointer;
+      font-size: 12px;
+    }
   }
   tbody tr td:first-child {
     font-size: 14px;

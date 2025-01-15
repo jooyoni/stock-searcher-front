@@ -9,12 +9,14 @@ function Main() {
   const { data } = useQuery<IStock[]>({
     queryKey: ['stockList'],
     queryFn: () => axiosInstance.get('/api/stock/list').then((res) => res.data),
+    initialData: JSON.parse(localStorage.getItem('cachedStockList') || '[]'),
   });
-
+  console.log(data);
   function handleStockClick(ticker: string) {
     const storage = [...checkedList];
     if (!storage.includes(ticker)) storage.push(ticker);
     localStorage.setItem('stockList', JSON.stringify(storage));
+    localStorage.setItem('cachedStockList', JSON.stringify(data));
     window.location.href = `https://invest.deepsearch.com/stock/${ticker}`;
   }
 
@@ -47,9 +49,9 @@ function Main() {
   });
 
   async function handlePick(ticker: string, pick_price: number) {
+    alert(`${ticker} 관심종목 등록 완료`);
     try {
       await postPick({ ticker, pick_price });
-      alert('관심종목 등록 완료');
     } catch {
       alert('에러가 발생했습니다.');
     }
