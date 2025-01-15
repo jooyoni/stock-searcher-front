@@ -24,7 +24,7 @@ function Pick() {
     }
   }
 
-  const [lastViewStock, setLastViewStock] = useState(localStorage.getItem('lastViewStock') || '');
+  const [lastViewStock, setLastViewStock] = useState('');
 
   const [selectedPick, setSelectedPick] = useState<string[]>(JSON.parse(localStorage.getItem('selectedPick') || '[]'));
 
@@ -47,6 +47,16 @@ function Pick() {
       window.location.href = `https://invest.deepsearch.com/stock/${ticker}`;
     }
   }
+
+  useEffect(() => {
+    const handlePageShow = () => {
+      setLastViewStock(localStorage.getItem('lastViewStock') || '');
+    };
+    window.addEventListener('pageshow', handlePageShow);
+    return () => {
+      window.removeEventListener('pageshow', handlePageShow);
+    };
+  }, []);
   return (
     <>
       <Header />
