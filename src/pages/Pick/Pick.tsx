@@ -29,12 +29,21 @@ function Pick() {
   const [selectedPick, setSelectedPick] = useState<string[]>(JSON.parse(localStorage.getItem('selectedPick') || '[]'));
 
   useEffect(() => {
+    if (selectedPick.length === 0) return;
     localStorage.setItem('selectedPick', JSON.stringify(selectedPick));
   }, [selectedPick]);
+
+  function handleCancelAll() {
+    setSelectedPick([]);
+    localStorage.removeItem('selectedPick');
+  }
   return (
     <>
       <Header />
       <div className={styles.container}>
+        <button className={styles.cancelAllButton} onClick={() => handleCancelAll()}>
+          전체취소
+        </button>
         <table className={styles.pickTable}>
           <thead>
             <tr>
