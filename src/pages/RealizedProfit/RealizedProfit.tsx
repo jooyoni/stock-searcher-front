@@ -2,8 +2,8 @@ import { useMutation, useQuery } from 'react-query';
 import { axiosInstance } from '../../axios/axios';
 import Header from '../../components/Header/Header';
 import styles from './RealizedProfit.module.scss';
-import { IRealizedProfit } from '../../types/stock';
-import { useState } from 'react';
+import { IMonthTargetPrice, IPortfolio, IRealizedProfit } from '../../types/stock';
+import { useEffect, useState } from 'react';
 import ModalPortal from '../../components/ModalPortal/ModalPortal';
 import ModalContainer from '../../components/ModalContainer/ModalContainer';
 
@@ -33,6 +33,52 @@ function RealizedProfit() {
 
   const [viewMode, setViewMode] = useState<'day' | 'month'>('day');
 
+  const [monthData, setMonthData] = useState<
+    {
+      year: number;
+      month: number;
+      price: number;
+    }[]
+  >([]);
+
+  useEffect(() => {
+    if (!data) return;
+    const newMonthData: {
+      year: number;
+      month: number;
+      price: number;
+    }[] = [];
+    data?.forEach((item) => {
+      const date = new Date(item.created_at);
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+      const lastData = newMonthData[newMonthData.length - 1];
+      if (lastData && lastData.year === year && lastData.month === month) {
+        lastData.price += item.sell_price;
+      } else {
+        newMonthData.push({ year, month, price: item.sell_price });
+      }
+    });
+    setMonthData(newMonthData);
+  }, [data]);
+
+  const { data: monthTargetPrice, refetch: refetchMonthTargetPrice } = useQuery<IMonthTargetPrice>({
+    queryKey: ['month-target-price'],
+    queryFn: () => axiosInstance.get('/api/target-price').then((res) => res.data),
+  });
+
+  const { data: portfolio } = useQuery<IPortfolio[]>({
+    queryKey: ['portfolio'],
+    queryFn: () => axiosInstance.get('/api/stock/portfolio').then((res) => res.data),
+  });
+
+  const { data: exchangeRate } = useQuery<{ exchange_rate: number }>({
+    queryKey: ['exchange-rate'],
+    queryFn: () => axiosInstance.get('/api/exchange-rate').then((res) => res.data),
+  });
+
+  const [updateTargetPriceModalOpen, setUpdateTargetPriceModalOpen] = useState(false);
+
   return (
     <>
       <Header />
@@ -47,6 +93,43 @@ function RealizedProfit() {
             원
           </span>
         </div>
+        {(() => {
+          if (!portfolio || !exchangeRate) return null;
+          return (
+            <div className={styles.monthProfit}>
+              <span>이번 달 목표 수익</span>
+              <span>{monthTargetPrice?.target_price.toLocaleString()}원</span>
+              <span>
+                (
+                {(() => {
+                  const thisMonth = monthData.find(
+                    (item) => item.year === new Date().getFullYear() && item.month === new Date().getMonth() + 1
+                  );
+                  const thisMonthPrice = thisMonth?.price || 0;
+
+                  let totalInvestment = 0;
+                  let totalMarketValue = 0;
+                  for (const stock of portfolio) {
+                    totalInvestment += stock.avg_price * stock.shares;
+                    totalMarketValue += stock.price * stock.shares;
+                  }
+                  const totalProfit = totalMarketValue - totalInvestment;
+
+                  return Math.floor(
+                    thisMonthPrice +
+                      totalProfit * (exchangeRate.exchange_rate || 0) -
+                      (monthTargetPrice?.target_price || 0)
+                  ).toLocaleString();
+                })()}
+                원)
+              </span>
+              <button onClick={() => setUpdateTargetPriceModalOpen(true)} className={styles.updateButton}>
+                수정
+              </button>
+            </div>
+          );
+        })()}
+
         <div className={styles.viewMode}>
           <button className={viewMode === 'day' ? styles.active : ''} onClick={() => setViewMode('day')}>
             일별
@@ -105,45 +188,16 @@ function RealizedProfit() {
                     </tr>
                   );
                 })
-              : (() => {
-                  const monthData: {
-                    year: number;
-                    month: number;
-                    price: number;
-                  }[] = [];
-                  data?.forEach((item) => {
-                    const date = new Date(item.created_at);
-                    const year = date.getFullYear();
-                    const month = date.getMonth() + 1;
-                    const lastData = monthData[monthData.length - 1];
-                    if (lastData && lastData.year === year && lastData.month === month) {
-                      lastData.price += item.sell_price;
-                    } else {
-                      monthData.push({ year, month, price: item.sell_price });
-                    }
-                  });
-
-                  return monthData.map((item) => {
-                    return (
-                      <tr key={`${item.year}-${item.month}`}>
-                        <td>{`${item.year}-${('0' + item.month).slice(-2)}`}</td>
-                        <td>{item.price.toLocaleString()}</td>
-                      </tr>
-                    );
-                  });
-                })()}
+              : monthData.map((item) => {
+                  return (
+                    <tr key={`${item.year}-${item.month}`}>
+                      <td>{`${item.year}-${('0' + item.month).slice(-2)}`}</td>
+                      <td>{item.price.toLocaleString()}</td>
+                    </tr>
+                  );
+                })}
           </tbody>
         </table>
-        {/* <div className={styles.monthProfit}>
-          <span>월별 실현손익</span>
-          <span>
-            {(() => {
-              const totalPrice = data ? data.reduce((acc, item) => acc + item.sell_price, 0) : 0;
-              return (totalPrice >= 0 ? '+' : '') + totalPrice?.toLocaleString();
-            })()}
-            원
-          </span>
-        </div> */}
       </div>
       <button className={styles.addButton} onClick={() => setAddModalOpen(true)}>
         +
@@ -151,6 +205,12 @@ function RealizedProfit() {
       {addModalOpen && <AddProfitModal handleClose={() => setAddModalOpen(false)} onUpdate={() => refetch()} />}
       {updateProfit && (
         <UpdateProfitModal profit={updateProfit} handleClose={() => setUpdateProfit(null)} onUpdate={() => refetch()} />
+      )}
+      {updateTargetPriceModalOpen && (
+        <UpdateTargetPriceModal
+          handleClose={() => setUpdateTargetPriceModalOpen(false)}
+          onUpdate={() => refetchMonthTargetPrice()}
+        />
       )}
     </>
   );
@@ -248,6 +308,50 @@ function UpdateProfitModal({
           <div className={styles.modalButton}>
             <button onClick={handleClose}>취소</button>
             <button onClick={handleUpdate}>수정</button>
+          </div>
+        </div>
+      </ModalContainer>
+    </ModalPortal>
+  );
+}
+
+function UpdateTargetPriceModal({ handleClose, onUpdate }: { handleClose: () => void; onUpdate: () => void }) {
+  const [targetPrice, setTargetPrice] = useState(0);
+
+  const { mutateAsync } = useMutation(() =>
+    axiosInstance
+      .put('/api/target-price', {
+        target_price: targetPrice,
+      })
+      .then((res) => res.data)
+  );
+
+  async function handleUpdate() {
+    handleClose();
+    try {
+      await mutateAsync();
+      onUpdate();
+      alert('수정 완료');
+    } catch {
+      alert('수정 실패');
+    }
+  }
+  return (
+    <ModalPortal>
+      <ModalContainer>
+        <div className={`${styles.modalContent} ${styles.addModalContent}`}>
+          <h2>이번 달 목표 수정</h2>
+          <input
+            type='number'
+            placeholder='목표 수익'
+            value={targetPrice || ''}
+            onChange={(e) => setTargetPrice(Number(e.currentTarget.value))}
+          />
+          <div className={styles.modalButton}>
+            <button onClick={handleClose}>취소</button>
+            <button onClick={handleUpdate} disabled={!targetPrice}>
+              수정
+            </button>
           </div>
         </div>
       </ModalContainer>

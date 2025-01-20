@@ -37,3 +37,8 @@ export interface IRealizedProfit {
   sell_price: number;
   ticker: string;
 }
+
+export interface IMonthTargetPrice {
+  id: number;
+  target_price: number;
+}
