@@ -2,7 +2,7 @@ import { useMutation, useQuery } from 'react-query';
 import { axiosInstance } from '../../axios/axios';
 import Header from '../../components/Header/Header';
 import styles from './RealizedProfit.module.scss';
-import { IMonthTargetPrice, IPortfolio, IRealizedProfit } from '../../types/stock';
+import { IRealizedProfit } from '../../types/stock';
 import { useEffect, useState } from 'react';
 import ModalPortal from '../../components/ModalPortal/ModalPortal';
 import ModalContainer from '../../components/ModalContainer/ModalContainer';
@@ -62,23 +62,6 @@ function RealizedProfit() {
     setMonthData(newMonthData);
   }, [data]);
 
-  const { data: monthTargetPrice, refetch: refetchMonthTargetPrice } = useQuery<IMonthTargetPrice>({
-    queryKey: ['month-target-price'],
-    queryFn: () => axiosInstance.get('/api/target-price').then((res) => res.data),
-  });
-
-  const { data: portfolio } = useQuery<IPortfolio[]>({
-    queryKey: ['portfolio'],
-    queryFn: () => axiosInstance.get('/api/stock/portfolio').then((res) => res.data),
-  });
-
-  const { data: exchangeRate } = useQuery<{ exchange_rate: number }>({
-    queryKey: ['exchange-rate'],
-    queryFn: () => axiosInstance.get('/api/exchange-rate').then((res) => res.data),
-  });
-
-  const [updateTargetPriceModalOpen, setUpdateTargetPriceModalOpen] = useState(false);
-
   return (
     <>
       <Header />
@@ -94,6 +77,57 @@ function RealizedProfit() {
           </span>
         </div>
         {(() => {
+          const YEAR_PROFIT = data
+            ? data.reduce((acc, item) => {
+                const YEAR = new Date().getFullYear();
+                return new Date(item.created_at).getFullYear() === YEAR ? acc + item.sell_price : acc;
+              }, 0)
+            : 0;
+          const PAST_YEAR_PROFIT = data
+            ? data.reduce((acc, item) => {
+                const YEAR = new Date().getFullYear() - 1;
+                return new Date(item.created_at).getFullYear() === YEAR ? acc + item.sell_price : acc;
+              }, 0)
+            : 0;
+
+          const TAX_DEDUCTION = 250_0000;
+          const NEXT_YEAR_TAX = YEAR_PROFIT - TAX_DEDUCTION > 0 ? Math.floor((YEAR_PROFIT - TAX_DEDUCTION) * 0.22) : 0;
+          const THIS_YEAR_TAX =
+            PAST_YEAR_PROFIT - TAX_DEDUCTION > 0 ? Math.floor((PAST_YEAR_PROFIT - TAX_DEDUCTION) * 0.22) : 0;
+          // (() => {
+          //   const totalPrice = data
+          //     ? data.reduce((acc, item) => {
+          //         const YEAR = new Date().getFullYear();
+          //         return new Date(item.created_at).getFullYear() === YEAR ? acc + item.sell_price : acc;
+          //       }, 0)
+          //     : 0;
+          //   return (totalPrice >= 0 ? '+' : '') + totalPrice?.toLocaleString();
+          // })();
+          return (
+            <>
+              <div className={styles.yearProfit}>
+                <span>올해 실현손익</span>
+                <span>
+                  {YEAR_PROFIT >= 0 ? '+' : ''}
+                  {YEAR_PROFIT.toLocaleString()}원
+                </span>
+                <span>내년 결제 예정 세금</span>
+                <span>{NEXT_YEAR_TAX.toLocaleString()}원</span>
+              </div>
+              <div className={styles.yearProfit}>
+                <span>작년 실현손익</span>
+                <span>
+                  {PAST_YEAR_PROFIT >= 0 ? '+' : ''}
+                  {PAST_YEAR_PROFIT.toLocaleString()}원
+                </span>
+                <span>올해 결제 세금</span>
+                <span>{THIS_YEAR_TAX.toLocaleString()}원</span>
+              </div>
+            </>
+          );
+        })()}
+
+        {/* {(() => {
           if (!portfolio || !exchangeRate) return null;
           return (
             <div className={styles.monthProfit}>
@@ -128,7 +162,7 @@ function RealizedProfit() {
               </button>
             </div>
           );
-        })()}
+        })()} */}
 
         <div className={styles.viewMode}>
           <button className={viewMode === 'day' ? styles.active : ''} onClick={() => setViewMode('day')}>
@@ -205,12 +239,6 @@ function RealizedProfit() {
       {addModalOpen && <AddProfitModal handleClose={() => setAddModalOpen(false)} onUpdate={() => refetch()} />}
       {updateProfit && (
         <UpdateProfitModal profit={updateProfit} handleClose={() => setUpdateProfit(null)} onUpdate={() => refetch()} />
-      )}
-      {updateTargetPriceModalOpen && (
-        <UpdateTargetPriceModal
-          handleClose={() => setUpdateTargetPriceModalOpen(false)}
-          onUpdate={() => refetchMonthTargetPrice()}
-        />
       )}
     </>
   );
@@ -315,48 +343,48 @@ function UpdateProfitModal({
   );
 }
 
-function UpdateTargetPriceModal({ handleClose, onUpdate }: { handleClose: () => void; onUpdate: () => void }) {
-  const [targetPrice, setTargetPrice] = useState(0);
+// function UpdateTargetPriceModal({ handleClose, onUpdate }: { handleClose: () => void; onUpdate: () => void }) {
+//   const [targetPrice, setTargetPrice] = useState(0);
 
-  const { mutateAsync } = useMutation(() =>
-    axiosInstance
-      .put('/api/target-price', {
-        target_price: targetPrice,
-      })
-      .then((res) => res.data)
-  );
+//   const { mutateAsync } = useMutation(() =>
+//     axiosInstance
+//       .put('/api/target-price', {
+//         target_price: targetPrice,
+//       })
+//       .then((res) => res.data)
+//   );
 
-  async function handleUpdate() {
-    handleClose();
-    try {
-      await mutateAsync();
-      onUpdate();
-      alert('수정 완료');
-    } catch {
-      alert('수정 실패');
-    }
-  }
-  return (
-    <ModalPortal>
-      <ModalContainer>
-        <div className={`${styles.modalContent} ${styles.addModalContent}`}>
-          <h2>이번 달 목표 수정</h2>
-          <input
-            type='number'
-            placeholder='목표 수익'
-            value={targetPrice || ''}
-            onChange={(e) => setTargetPrice(Number(e.currentTarget.value))}
-          />
-          <div className={styles.modalButton}>
-            <button onClick={handleClose}>취소</button>
-            <button onClick={handleUpdate} disabled={!targetPrice}>
-              수정
-            </button>
-          </div>
-        </div>
-      </ModalContainer>
-    </ModalPortal>
-  );
-}
+//   async function handleUpdate() {
+//     handleClose();
+//     try {
+//       await mutateAsync();
+//       onUpdate();
+//       alert('수정 완료');
+//     } catch {
+//       alert('수정 실패');
+//     }
+//   }
+//   return (
+//     <ModalPortal>
+//       <ModalContainer>
+//         <div className={`${styles.modalContent} ${styles.addModalContent}`}>
+//           <h2>이번 달 목표 수정</h2>
+//           <input
+//             type='number'
+//             placeholder='목표 수익'
+//             value={targetPrice || ''}
+//             onChange={(e) => setTargetPrice(Number(e.currentTarget.value))}
+//           />
+//           <div className={styles.modalButton}>
+//             <button onClick={handleClose}>취소</button>
+//             <button onClick={handleUpdate} disabled={!targetPrice}>
+//               수정
+//             </button>
+//           </div>
+//         </div>
+//       </ModalContainer>
+//     </ModalPortal>
+//   );
+// }
 
 export default RealizedProfit;
