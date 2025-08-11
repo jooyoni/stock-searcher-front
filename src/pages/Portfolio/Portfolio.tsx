@@ -157,6 +157,10 @@ function PortfolioStock({
   const investment = stock.avg_price * stock.shares * (currency === 'krw' ? exchangeRate : 1);
   const returnRate = ((marketValue - investment) / investment) * 100;
 
+  const [averageDownCalculatorOpen, setAverageDownCalculatorOpen] = useState(false);
+  const [addTargetPrice, setAddTargetPrice] = useState(stock.price);
+  const [addMoney, setAddMoney] = useState(0);
+
   const [updateModalOpen, setUpdateModalOpen] = useState(false);
 
   const [avgPrice, setAvgPrice] = useState(stock.avg_price);
@@ -224,10 +228,55 @@ function PortfolioStock({
         </span>
         <span>수익률 : {Number(returnRate.toFixed(2))}%</span>
         <div className={styles.buttons}>
+          <button onClick={() => setAverageDownCalculatorOpen(true)}>물타기</button>
           <button onClick={() => setUpdateModalOpen(true)}>수정</button>
           <button onClick={handleDelete}>삭제</button>
         </div>
       </li>
+      {averageDownCalculatorOpen && (
+        <ModalPortal>
+          <ModalContainer>
+            <div className={styles.modalContent}>
+              <h2>물타기</h2>
+              <ul className={styles.averageDownCalculator}>
+                <li>
+                  <span>현재 평단가</span>
+                  <input type='number' value={stock.avg_price} disabled />
+                </li>
+                <li>
+                  <span>물타기 단가</span>
+                  <input
+                    type='number'
+                    value={addTargetPrice}
+                    onChange={(e) => setAddTargetPrice(Number(e.currentTarget.value))}
+                  />
+                </li>
+                <li>
+                  <span>물타기 자본(원)</span>
+                  <input
+                    type='text'
+                    value={addMoney ? addMoney.toLocaleString() : ''}
+                    onChange={(e) => setAddMoney(Number(e.currentTarget.value.replace(/,/g, '')))}
+                  />
+                </li>
+              </ul>
+              <span className={styles.averageDownCalculatorResult}>
+                예상 평단가 :{' '}
+                {(() => {
+                  const ADD_MONEY = addMoney / exchangeRate;
+                  const CAN_BUY_SHARES = Math.floor(ADD_MONEY / stock.price);
+                  const NEW_AVG_PRICE = (stock.avg_price * stock.shares + ADD_MONEY) / (stock.shares + CAN_BUY_SHARES);
+                  return NEW_AVG_PRICE.toFixed(4);
+                })()}
+                $
+              </span>
+              <div className={styles.modalButton}>
+                <button onClick={() => setAverageDownCalculatorOpen(false)}>취소</button>
+              </div>
+            </div>
+          </ModalContainer>
+        </ModalPortal>
+      )}
       {updateModalOpen && (
         <ModalPortal>
           <ModalContainer>

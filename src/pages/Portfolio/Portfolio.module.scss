@@ -71,7 +71,34 @@
   }
   h2 {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
+  }
+
+  .averageDownCalculatorResult {
+    display: block;
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+
+  .averageDownCalculator {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 10px;
+    li {
+      display: flex;
+      align-items: center;
+      span:first-child {
+        width: 100px;
+        font-size: 12px;
+      }
+      input {
+        border: 1px solid rgb(161, 155, 155);
+        border-radius: 8px;
+        padding: 4px 8px;
+      }
+    }
   }
 
   .buyInfo {
@@ -86,12 +113,18 @@
       span:first-child {
         width: 100px;
       }
+      input {
+        border: 1px solid rgb(161, 155, 155);
+        border-radius: 8px;
+        padding: 4px 8px;
+      }
     }
   }
   .modalButton {
     display: flex;
     gap: 5px;
     button {
+      flex-grow: 1;
       width: 50%;
       height: 40px;
       border-radius: 8px;
