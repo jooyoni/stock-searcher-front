@@ -264,7 +264,7 @@ function PortfolioStock({
                 예상 평단가 :{' '}
                 {(() => {
                   const ADD_MONEY = addMoney / exchangeRate;
-                  const CAN_BUY_SHARES = Math.floor(ADD_MONEY / stock.price);
+                  const CAN_BUY_SHARES = Math.floor(ADD_MONEY / addTargetPrice);
                   const NEW_AVG_PRICE = (stock.avg_price * stock.shares + ADD_MONEY) / (stock.shares + CAN_BUY_SHARES);
                   return NEW_AVG_PRICE.toFixed(4);
                 })()}
