@@ -212,6 +212,12 @@ function PortfolioStock({
         <span>
           평단가 : {Number((stock.avg_price * (currency === 'krw' ? exchangeRate : 1)).toFixed(4)).toLocaleString()}
           {currencyMark}
+          {stock.avg_price > stock.price &&
+            `(본전 회복까지 ${(() => {
+              const needPrice = stock.avg_price - stock.price;
+              const needReturnRate = (needPrice / stock.price) * 100;
+              return Number(String(needReturnRate.toFixed(2)));
+            })()}% 상승 필요)`}
         </span>
         <span>총 주식 수 : {stock.shares.toLocaleString()}개</span>
         <span>
